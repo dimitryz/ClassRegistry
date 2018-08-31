@@ -36,4 +36,14 @@ final class ClassRegistryTests: XCTestCase {
     }
     XCTAssertNotNil(classRegistry.resolve(Owner.self)?.pet)
   }
+  
+  func testStaticReference() {
+    ClassRegistry.shared.register(Pet.self, instance: Dog())
+    XCTAssertNotNil(ClassRegistry.shared.resolve(Pet.self) as? Dog)
+  }
+  
+  func testBadRegitry() {
+    let classRegistry = ClassRegistry()
+    XCTAssertNil(classRegistry.resolve(Owner.self))
+  }
 }

@@ -3,6 +3,8 @@ import Foundation
 /// A registry holds either a class or a generator of a class.
 public class ClassRegistry {
   
+  public static let shared = ClassRegistry()
+  
   public init() {
     registers = [:]
   }
