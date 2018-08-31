@@ -22,7 +22,7 @@ public class ClassRegistry {
   }
   
   public func resolve<T>(_ type: T.Type) -> T? {
-    guard let register = registers[keyFor(type)] else {
+    guard let register = getRegister(forType: type) else {
       return nil
     }
     
@@ -37,16 +37,22 @@ public class ClassRegistry {
   // MARK: Private
   
   private let lock = DispatchSemaphore(value: 1)
-  private var registers: [Int: ClassRegister]
+  private var registers: [String: ClassRegister]
   
-  private func keyFor<T>(_ type: T.Type) -> Int {
-    return ObjectIdentifier(type).hashValue
+  private func keyFor<T>(_ type: T.Type) -> String {
+    return String(describing: type)
   }
   
   private func set<T>(register: ClassRegister, forType type: T.Type) {
     lock.wait()
     defer { lock.signal() }
     registers[keyFor(type)] = register
+  }
+  
+  private func getRegister<T>(forType type: T.Type) -> ClassRegister? {
+    lock.wait()
+    defer { lock.signal() }
+    return registers[keyFor(type)]
   }
 }
 
