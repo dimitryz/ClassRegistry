@@ -1,16 +1,39 @@
 import XCTest
 @testable import ClassRegistry
 
+protocol Pet {}
+
+struct Dog: Pet {}
+
+struct Owner {
+  let pet: Pet
+  init(pet: Pet) {
+    self.pet = pet
+  }
+}
+
 final class ClassRegistryTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(ClassRegistry().text, "Hello, World!")
+  
+  func testBasicInitialization() {
+    let classRegistry = ClassRegistry()
+    classRegistry.register(Dog.self, instance: Dog())
+    XCTAssertNotNil(classRegistry.resolve(Dog.self))
+  }
+  
+  func testCallbackInitialization() {
+    let classRegistry = ClassRegistry()
+    classRegistry.register(Dog.self) {
+      return Dog()
     }
-
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+    XCTAssertNotNil(classRegistry.resolve(Dog.self))
+  }
+  
+  func testCallbackWithRegister() {
+    let classRegistry = ClassRegistry()
+    classRegistry.register(Pet.self, instance: Dog())
+    classRegistry.register(Owner.self) { classRegistry in
+      return Owner(pet: classRegistry.resolve(Pet.self)!)
+    }
+    XCTAssertNotNil(classRegistry.resolve(Owner.self)?.pet)
+  }
 }
